@@ -1,13 +1,19 @@
 <?php
 
 use App\Models\User;
+use Database\Seeders\RoleSeeder;
+
+beforeEach(function () {
+    $this->seed(RoleSeeder::class);
+});
 
 it('redirects guests from the admin panel to login', function () {
     $this->get('/admin')->assertRedirect();
 });
 
-it('allows an active authenticated user to reach the admin panel', function () {
+it('allows an active administrator to reach the admin panel', function () {
     $user = User::factory()->create();
+    $user->assignRole('admin');
 
     $this->actingAs($user)
         ->get('/admin')
