@@ -14,6 +14,8 @@ class InteractionsRelationManager extends RelationManager
 
     protected static ?string $title = 'سجل التواصل';
 
+    protected static bool $isLazy = false;
+
     public function form(Schema $schema): Schema
     {
         return $schema->components([]);

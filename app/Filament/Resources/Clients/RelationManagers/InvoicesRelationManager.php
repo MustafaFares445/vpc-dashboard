@@ -16,6 +16,8 @@ class InvoicesRelationManager extends RelationManager
 
     protected static ?string $title = 'الفواتير المرتبطة';
 
+    protected static bool $isLazy = false;
+
     public function form(Schema $schema): Schema
     {
         return $schema->components([]);

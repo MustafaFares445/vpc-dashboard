@@ -19,6 +19,8 @@ class TasksRelationManager extends RelationManager
 
     protected static ?string $title = 'المهام المرتبطة';
 
+    protected static bool $isLazy = false;
+
     public function form(Schema $schema): Schema
     {
         return $schema->components([]);
