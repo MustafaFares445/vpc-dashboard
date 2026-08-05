@@ -21,5 +21,8 @@ return new class extends Migration
         });
     }
 
-    public function down(): void { Schema::dropIfExists('invoice_items'); }
+    public function down(): void
+    {
+        Schema::dropIfExists('invoice_items');
+    }
 };

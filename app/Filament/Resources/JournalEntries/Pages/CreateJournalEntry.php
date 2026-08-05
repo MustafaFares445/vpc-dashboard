@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 class CreateJournalEntry extends CreateRecord
 {
     protected static string $resource = JournalEntryResource::class;
+
     protected static bool $canCreateAnother = false;
 
     protected function handleRecordCreation(array $data): Model
@@ -17,6 +18,7 @@ class CreateJournalEntry extends CreateRecord
         $lines = $data['lines'] ?? [];
         unset($data['lines']);
         $data['created_by'] = auth()->id();
+
         return app(JournalEntryService::class)->create($data, $lines);
     }
 }

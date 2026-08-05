@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 class CreateInvoice extends CreateRecord
 {
     protected static string $resource = InvoiceResource::class;
+
     protected static bool $canCreateAnother = false;
 
     protected function handleRecordCreation(array $data): Model
@@ -17,6 +18,7 @@ class CreateInvoice extends CreateRecord
         $items = $data['items'] ?? [];
         unset($data['items']);
         $data['created_by'] = auth()->id();
+
         return app(InvoiceService::class)->create($data, $items);
     }
 }

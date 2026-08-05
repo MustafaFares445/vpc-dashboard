@@ -12,17 +12,36 @@ use UnitEnum;
 class CalendarPage extends Page
 {
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
+
     protected static ?string $navigationLabel = 'التقويم';
+
     protected static string|UnitEnum|null $navigationGroup = 'الرئيسية';
+
     protected static ?string $slug = 'calendar';
+
     protected string $view = 'filament.pages.calendar-page';
 
     public string $month;
 
-    public function mount(): void { $this->month = now()->format('Y-m'); }
-    public function previousMonth(): void { $this->month = CarbonImmutable::createFromFormat('Y-m', $this->month)->subMonth()->format('Y-m'); }
-    public function nextMonth(): void { $this->month = CarbonImmutable::createFromFormat('Y-m', $this->month)->addMonth()->format('Y-m'); }
-    public function currentMonth(): void { $this->month = now()->format('Y-m'); }
+    public function mount(): void
+    {
+        $this->month = now()->format('Y-m');
+    }
+
+    public function previousMonth(): void
+    {
+        $this->month = CarbonImmutable::createFromFormat('Y-m', $this->month)->subMonth()->format('Y-m');
+    }
+
+    public function nextMonth(): void
+    {
+        $this->month = CarbonImmutable::createFromFormat('Y-m', $this->month)->addMonth()->format('Y-m');
+    }
+
+    public function currentMonth(): void
+    {
+        $this->month = now()->format('Y-m');
+    }
 
     public function calendarDays(): array
     {
@@ -33,6 +52,7 @@ class CalendarPage extends Page
 
         return collect(range(0, 41))->map(function (int $offset) use ($start, $month, $events): array {
             $date = $start->addDays($offset);
+
             return [
                 'date' => $date,
                 'is_current_month' => $date->month === $month->month,

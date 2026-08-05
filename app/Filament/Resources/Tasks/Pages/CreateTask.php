@@ -12,7 +12,10 @@ class CreateTask extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['created_by'] = auth()->id();
-        if (! auth()->user()->isAdmin()) { $data['assigned_to'] = auth()->id(); }
+        if (! auth()->user()->isAdmin()) {
+            $data['assigned_to'] = auth()->id();
+        }
+
         return $data;
     }
 }

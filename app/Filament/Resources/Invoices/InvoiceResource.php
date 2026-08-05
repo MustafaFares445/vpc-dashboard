@@ -30,12 +30,28 @@ use UnitEnum;
 class InvoiceResource extends Resource
 {
     protected static ?string $model = Invoice::class;
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentCurrencyDollar;
 
-    public static function getNavigationGroup(): string|UnitEnum|null { return 'المحاسبة'; }
-    public static function getNavigationLabel(): string { return 'الفواتير'; }
-    public static function getModelLabel(): string { return 'فاتورة'; }
-    public static function getPluralModelLabel(): string { return 'الفواتير'; }
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return 'المحاسبة';
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return 'الفواتير';
+    }
+
+    public static function getModelLabel(): string
+    {
+        return 'فاتورة';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'الفواتير';
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -72,8 +88,8 @@ class InvoiceResource extends Resource
             SelectFilter::make('status')->label('الحالة')->options(InvoiceStatus::options()),
             SelectFilter::make('client_id')->label('العميل')->relationship('client', 'name'),
         ])->recordActions([EditAction::make()])
-          ->toolbarActions([BulkActionGroup::make([DeleteBulkAction::make()])])
-          ->defaultSort('issue_date', 'desc');
+            ->toolbarActions([BulkActionGroup::make([DeleteBulkAction::make()])])
+            ->defaultSort('issue_date', 'desc');
     }
 
     public static function getPages(): array

@@ -9,7 +9,9 @@ use App\Models\User;
 use App\Services\CalendarEventService;
 use Database\Seeders\RoleSeeder;
 
-beforeEach(function () { $this->seed(RoleSeeder::class); });
+beforeEach(function () {
+    $this->seed(RoleSeeder::class);
+});
 
 it('returns only calendar events assigned to an employee', function () {
     $employee = User::factory()->create();

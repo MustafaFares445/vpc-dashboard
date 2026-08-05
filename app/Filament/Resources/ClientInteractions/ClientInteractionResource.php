@@ -28,12 +28,28 @@ use UnitEnum;
 class ClientInteractionResource extends Resource
 {
     protected static ?string $model = ClientInteraction::class;
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChatBubbleLeftRight;
 
-    public static function getNavigationGroup(): string|UnitEnum|null { return 'العملاء'; }
-    public static function getNavigationLabel(): string { return 'المتابعات'; }
-    public static function getModelLabel(): string { return 'متابعة'; }
-    public static function getPluralModelLabel(): string { return 'المتابعات'; }
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return 'العملاء';
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return 'المتابعات';
+    }
+
+    public static function getModelLabel(): string
+    {
+        return 'متابعة';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'المتابعات';
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -63,14 +79,17 @@ class ClientInteractionResource extends Resource
         ])->filters([
             SelectFilter::make('contact_method')->label('الوسيلة')->options(ContactMethod::options()),
         ])->recordActions([EditAction::make()])
-          ->toolbarActions([BulkActionGroup::make([DeleteBulkAction::make()])])
-          ->defaultSort('contacted_at', 'desc');
+            ->toolbarActions([BulkActionGroup::make([DeleteBulkAction::make()])])
+            ->defaultSort('contacted_at', 'desc');
     }
 
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery()->with(['client', 'user']);
-        if (auth()->user()->isAdmin()) { return $query; }
+        if (auth()->user()->isAdmin()) {
+            return $query;
+        }
+
         return $query->whereHas('client', fn (Builder $clientQuery): Builder => $clientQuery->where('assigned_to', auth()->id()));
     }
 

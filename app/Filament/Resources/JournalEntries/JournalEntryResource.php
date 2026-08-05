@@ -22,12 +22,28 @@ use UnitEnum;
 class JournalEntryResource extends Resource
 {
     protected static ?string $model = JournalEntry::class;
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBookOpen;
 
-    public static function getNavigationGroup(): string|UnitEnum|null { return 'المحاسبة'; }
-    public static function getNavigationLabel(): string { return 'القيود اليومية'; }
-    public static function getModelLabel(): string { return 'قيد يومي'; }
-    public static function getPluralModelLabel(): string { return 'القيود اليومية'; }
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return 'المحاسبة';
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return 'القيود اليومية';
+    }
+
+    public static function getModelLabel(): string
+    {
+        return 'قيد يومي';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'القيود اليومية';
+    }
 
     public static function form(Schema $schema): Schema
     {

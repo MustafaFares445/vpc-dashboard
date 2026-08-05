@@ -9,6 +9,7 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 class FollowUpOverviewWidget extends StatsOverviewWidget
 {
     protected static ?int $sort = 3;
+
     protected int|string|array $columnSpan = 'full';
 
     public function getStats(): array

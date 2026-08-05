@@ -32,9 +32,20 @@ class FinancialTransaction extends Model implements HasMedia
         ];
     }
 
-    public function client(): BelongsTo { return $this->belongsTo(Client::class); }
-    public function invoice(): BelongsTo { return $this->belongsTo(Invoice::class); }
-    public function creator(): BelongsTo { return $this->belongsTo(User::class, 'created_by'); }
+    public function client(): BelongsTo
+    {
+        return $this->belongsTo(Client::class);
+    }
+
+    public function invoice(): BelongsTo
+    {
+        return $this->belongsTo(Invoice::class);
+    }
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 
     public function scopeBetweenDates(Builder $query, mixed $from = null, mixed $to = null): Builder
     {

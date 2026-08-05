@@ -17,5 +17,8 @@ class JournalEntryLine extends Model
         return ['debit' => 'decimal:2', 'credit' => 'decimal:2'];
     }
 
-    public function journalEntry(): BelongsTo { return $this->belongsTo(JournalEntry::class); }
+    public function journalEntry(): BelongsTo
+    {
+        return $this->belongsTo(JournalEntry::class);
+    }
 }

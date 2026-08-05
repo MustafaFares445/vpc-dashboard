@@ -20,6 +20,13 @@ class JournalEntry extends Model
         return ['entry_date' => 'date'];
     }
 
-    public function lines(): HasMany { return $this->hasMany(JournalEntryLine::class); }
-    public function creator(): BelongsTo { return $this->belongsTo(User::class, 'created_by'); }
+    public function lines(): HasMany
+    {
+        return $this->hasMany(JournalEntryLine::class);
+    }
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }

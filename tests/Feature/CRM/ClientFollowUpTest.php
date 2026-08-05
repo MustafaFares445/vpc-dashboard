@@ -6,7 +6,9 @@ use App\Models\ClientInteraction;
 use App\Models\User;
 use Database\Seeders\RoleSeeder;
 
-beforeEach(function () { $this->seed(RoleSeeder::class); });
+beforeEach(function () {
+    $this->seed(RoleSeeder::class);
+});
 
 it('syncs the latest interaction dates to the client', function () {
     $user = User::factory()->create();
@@ -24,8 +26,10 @@ it('syncs the latest interaction dates to the client', function () {
 });
 
 it('scopes employees to their assigned clients', function () {
-    $employee = User::factory()->create(); $employee->assignRole('employee');
-    $other = User::factory()->create(); $other->assignRole('employee');
+    $employee = User::factory()->create();
+    $employee->assignRole('employee');
+    $other = User::factory()->create();
+    $other->assignRole('employee');
     Client::query()->create(['name' => 'Visible', 'status' => ClientStatus::Active, 'assigned_to' => $employee->id]);
     Client::query()->create(['name' => 'Hidden', 'status' => ClientStatus::Active, 'assigned_to' => $other->id]);
     expect(Client::query()->visibleTo($employee)->pluck('name')->all())->toBe(['Visible']);

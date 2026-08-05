@@ -33,10 +33,25 @@ class Invoice extends Model implements HasMedia
         ];
     }
 
-    public function client(): BelongsTo { return $this->belongsTo(Client::class); }
-    public function items(): HasMany { return $this->hasMany(InvoiceItem::class)->orderBy('sort_order'); }
-    public function transactions(): HasMany { return $this->hasMany(FinancialTransaction::class); }
-    public function creator(): BelongsTo { return $this->belongsTo(User::class, 'created_by'); }
+    public function client(): BelongsTo
+    {
+        return $this->belongsTo(Client::class);
+    }
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(InvoiceItem::class)->orderBy('sort_order');
+    }
+
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(FinancialTransaction::class);
+    }
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 
     public function registerMediaCollections(): void
     {

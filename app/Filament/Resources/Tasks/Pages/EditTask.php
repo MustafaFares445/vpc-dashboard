@@ -12,7 +12,10 @@ class EditTask extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        if (! auth()->user()->isAdmin()) { $data['assigned_to'] = auth()->id(); }
+        if (! auth()->user()->isAdmin()) {
+            $data['assigned_to'] = auth()->id();
+        }
+
         return $data;
     }
 

@@ -20,5 +20,8 @@ return new class extends Migration
         });
     }
 
-    public function down(): void { Schema::dropIfExists('journal_entry_lines'); }
+    public function down(): void
+    {
+        Schema::dropIfExists('journal_entry_lines');
+    }
 };

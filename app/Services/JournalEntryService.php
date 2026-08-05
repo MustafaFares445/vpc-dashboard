@@ -16,6 +16,7 @@ class JournalEntryService
         return DB::transaction(function () use ($data, $normalizedLines): JournalEntry {
             $entry = JournalEntry::query()->create(Arr::only($data, ['entry_date', 'reference', 'description', 'created_by']));
             $entry->lines()->createMany($normalizedLines);
+
             return $entry->load('lines');
         });
     }

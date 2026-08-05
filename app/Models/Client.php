@@ -27,12 +27,35 @@ class Client extends Model implements HasMedia
         return ['status' => ClientStatus::class, 'last_contact_at' => 'datetime', 'next_follow_up_at' => 'datetime'];
     }
 
-    public function assignedUser(): BelongsTo { return $this->belongsTo(User::class, 'assigned_to'); }
-    public function creator(): BelongsTo { return $this->belongsTo(User::class, 'created_by'); }
-    public function interactions(): HasMany { return $this->hasMany(ClientInteraction::class); }
-    public function tasks(): HasMany { return $this->hasMany(Task::class); }
-    public function invoices(): HasMany { return $this->hasMany(Invoice::class); }
-    public function financialTransactions(): HasMany { return $this->hasMany(FinancialTransaction::class); }
+    public function assignedUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
+    }
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function interactions(): HasMany
+    {
+        return $this->hasMany(ClientInteraction::class);
+    }
+
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(Task::class);
+    }
+
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
+    public function financialTransactions(): HasMany
+    {
+        return $this->hasMany(FinancialTransaction::class);
+    }
 
     public function scopeVisibleTo(Builder $query, User $user): Builder
     {

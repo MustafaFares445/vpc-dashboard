@@ -6,7 +6,9 @@ use App\Models\Task;
 use App\Models\User;
 use Database\Seeders\RoleSeeder;
 
-beforeEach(function () { $this->seed(RoleSeeder::class); });
+beforeEach(function () {
+    $this->seed(RoleSeeder::class);
+});
 
 it('sets and clears the completion timestamp from the status', function () {
     $user = User::factory()->create();

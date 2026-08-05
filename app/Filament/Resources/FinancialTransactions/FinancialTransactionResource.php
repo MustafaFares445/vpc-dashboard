@@ -34,12 +34,28 @@ use UnitEnum;
 class FinancialTransactionResource extends Resource
 {
     protected static ?string $model = FinancialTransaction::class;
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBanknotes;
 
-    public static function getNavigationGroup(): string|UnitEnum|null { return 'المحاسبة'; }
-    public static function getNavigationLabel(): string { return 'الإيرادات والمصاريف'; }
-    public static function getModelLabel(): string { return 'عملية مالية'; }
-    public static function getPluralModelLabel(): string { return 'العمليات المالية'; }
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return 'المحاسبة';
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return 'الإيرادات والمصاريف';
+    }
+
+    public static function getModelLabel(): string
+    {
+        return 'عملية مالية';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'العمليات المالية';
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -75,8 +91,8 @@ class FinancialTransactionResource extends Resource
                 DatePicker::make('to')->label('إلى'),
             ])->query(fn (Builder $query, array $data): Builder => $query->betweenDates($data['from'] ?? null, $data['to'] ?? null)),
         ])->recordActions([EditAction::make()])
-          ->toolbarActions([BulkActionGroup::make([DeleteBulkAction::make()])])
-          ->defaultSort('date', 'desc');
+            ->toolbarActions([BulkActionGroup::make([DeleteBulkAction::make()])])
+            ->defaultSort('date', 'desc');
     }
 
     public static function getPages(): array

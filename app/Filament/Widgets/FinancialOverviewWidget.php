@@ -12,6 +12,7 @@ class FinancialOverviewWidget extends StatsOverviewWidget
     use InteractsWithPageFilters;
 
     protected static ?int $sort = 1;
+
     protected int|string|array $columnSpan = 'full';
 
     public static function canView(): bool

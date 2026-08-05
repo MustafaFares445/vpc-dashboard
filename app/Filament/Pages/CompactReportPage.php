@@ -11,12 +11,17 @@ use UnitEnum;
 class CompactReportPage extends Page
 {
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChartBarSquare;
+
     protected static ?string $navigationLabel = 'التقرير المختصر';
+
     protected static string|UnitEnum|null $navigationGroup = 'المحاسبة';
+
     protected static ?string $slug = 'compact-report';
+
     protected string $view = 'filament.pages.compact-report-page';
 
     public string $from;
+
     public string $to;
 
     public function mount(): void
@@ -35,5 +40,8 @@ class CompactReportPage extends Page
         return app(CompactReportService::class)->summarize($this->from, $this->to);
     }
 
-    public function getHeading(): string { return 'التقرير المختصر'; }
+    public function getHeading(): string
+    {
+        return 'التقرير المختصر';
+    }
 }
