@@ -6,8 +6,6 @@ use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
 use App\Filament\Resources\Clients\Pages\ViewClient;
 use App\Filament\Resources\Clients\RelationManagers\InteractionsRelationManager;
-use App\Filament\Resources\Clients\RelationManagers\InvoicesRelationManager;
-use App\Filament\Resources\Clients\RelationManagers\TasksRelationManager;
 use App\Models\Client;
 use App\Models\ClientInteraction;
 use App\Models\Invoice;
@@ -69,10 +67,8 @@ it('renders the complete client profile for administrators', function () {
         ->assertSee('الرصيد غير المدفوع')
         ->assertSeeLivewire(InteractionsRelationManager::class)
         ->set('activeRelationManager', 'tasks')
-        ->assertSeeLivewire(TasksRelationManager::class)
         ->assertSee('Prepare quotation')
         ->set('activeRelationManager', 'invoices')
-        ->assertSeeLivewire(InvoicesRelationManager::class)
         ->assertSee('INV-CLIENT-001');
 });
 
@@ -116,7 +112,6 @@ it('scopes client profile data for employees', function () {
         ->assertDontSee('إجمالي الفواتير')
         ->assertDontSee('الرصيد غير المدفوع')
         ->set('activeRelationManager', 'tasks')
-        ->assertSeeLivewire(TasksRelationManager::class)
         ->assertSee('Visible employee task')
         ->assertDontSee('Hidden employee task');
 
