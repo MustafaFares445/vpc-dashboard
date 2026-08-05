@@ -20,6 +20,7 @@ class InvoiceService
         return DB::transaction(function () use ($invoiceData, $normalizedItems): Invoice {
             $invoice = Invoice::query()->create($invoiceData);
             $invoice->items()->createMany($normalizedItems);
+
             return $invoice->load(['items', 'client']);
         });
     }
@@ -28,12 +29,15 @@ class InvoiceService
     {
         [$normalizedItems, $subtotal] = $this->normalizeItems($items);
         $invoiceData = $this->prepareInvoiceData($data, $subtotal);
+        $invoiceData['invoice_number'] = $invoiceData['invoice_number'] ?: $invoice->invoice_number;
 
         return DB::transaction(function () use ($invoice, $invoiceData, $normalizedItems): Invoice {
+            /** @var Invoice $lockedInvoice */
             $lockedInvoice = Invoice::query()->lockForUpdate()->findOrFail($invoice->getKey());
             $lockedInvoice->update($invoiceData);
             $lockedInvoice->items()->delete();
             $lockedInvoice->items()->createMany($normalizedItems);
+
             return $lockedInvoice->load(['items', 'client']);
         });
     }
@@ -41,8 +45,11 @@ class InvoiceService
     private function prepareInvoiceData(array $data, float $subtotal): array
     {
         $paidAmount = round((float) ($data['paid_amount'] ?? 0), 2);
+
         if ($paidAmount < 0 || $paidAmount > $subtotal) {
-            throw ValidationException::withMessages(['data.paid_amount' => 'المبلغ المدفوع يجب أن يكون بين صفر وإجمالي الفاتورة.']);
+            throw ValidationException::withMessages([
+                'data.paid_amount' => 'المبلغ المدفوع يجب أن يكون بين صفر وإجمالي الفاتورة.',
+            ]);
         }
 
         $prepared = Arr::only($data, ['invoice_number', 'client_id', 'issue_date', 'due_date', 'paid_amount', 'notes', 'created_by']);
@@ -51,6 +58,7 @@ class InvoiceService
         $prepared['total'] = $subtotal;
         $prepared['paid_amount'] = $paidAmount;
         $prepared['status'] = InvoiceStatus::fromAmounts($subtotal, $paidAmount);
+
         return $prepared;
     }
 
@@ -77,7 +85,13 @@ class InvoiceService
 
             $lineTotal = round($quantity * $unitPrice, 2);
             $subtotal += $lineTotal;
-            $normalized[] = ['description' => $item['description'], 'quantity' => $quantity, 'unit_price' => $unitPrice, 'line_total' => $lineTotal, 'sort_order' => $index + 1];
+            $normalized[] = [
+                'description' => $item['description'],
+                'quantity' => $quantity,
+                'unit_price' => $unitPrice,
+                'line_total' => $lineTotal,
+                'sort_order' => $index + 1,
+            ];
         }
 
         return [$normalized, round($subtotal, 2)];

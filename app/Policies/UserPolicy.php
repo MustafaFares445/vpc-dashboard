@@ -28,7 +28,15 @@ class UserPolicy
 
     public function delete(User $user, User $model): bool
     {
-        return $user->isAdmin() && $user->isNot($model);
+        if (! $user->isAdmin() || $user->is($model)) {
+            return false;
+        }
+
+        if ($model->isAdmin() && User::role('admin')->where('is_active', true)->count() <= 1) {
+            return false;
+        }
+
+        return true;
     }
 
     public function deleteAny(User $user): bool

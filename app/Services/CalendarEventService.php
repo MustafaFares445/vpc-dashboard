@@ -36,6 +36,6 @@ class CalendarEventService
                 'url' => TaskResource::getUrl('edit', ['record' => $task]),
             ]);
 
-        return $clientEvents->concat($taskEvents)->sortBy(['date', 'title'])->values();
+        return $clientEvents->concat($taskEvents)->sortBy([['date', 'asc'], ['title', 'asc']])->values();
     }
 }

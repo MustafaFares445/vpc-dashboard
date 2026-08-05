@@ -24,7 +24,7 @@ class ClientPolicy
 
     public function update(User $user, Client $client): bool
     {
-        return $user->isAdmin() || $client->assigned_to === $user->getKey();
+        return $user->isAdmin();
     }
 
     public function delete(User $user, Client $client): bool

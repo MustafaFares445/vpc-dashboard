@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   quality:
     runs-on: ubuntu-latest
@@ -24,7 +28,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: npm
 
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
@@ -35,9 +38,10 @@ jobs:
           php artisan key:generate
           touch database/database.sqlite
           php artisan migrate --force
+          php artisan db:seed --force
 
       - name: Install frontend dependencies
-        run: npm ci
+        run: npm install --ignore-scripts
 
       - name: Build frontend
         run: npm run build
