@@ -7,6 +7,9 @@ use App\Filament\Resources\Clients\Pages\CreateClient;
 use App\Filament\Resources\Clients\Pages\EditClient;
 use App\Filament\Resources\Clients\Pages\ListClients;
 use App\Filament\Resources\Clients\Pages\ViewClient;
+use App\Filament\Resources\Clients\RelationManagers\InteractionsRelationManager;
+use App\Filament\Resources\Clients\RelationManagers\InvoicesRelationManager;
+use App\Filament\Resources\Clients\RelationManagers\TasksRelationManager;
 use App\Models\Client;
 use App\Models\User;
 use BackedEnum;
@@ -19,6 +22,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -82,6 +86,80 @@ class ClientResource extends Resource
         ]);
     }
 
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema->components([
+            Section::make('ملخص العميل')
+                ->columns(3)
+                ->schema([
+                    TextEntry::make('name')->label('الاسم'),
+                    TextEntry::make('company_name')->label('الشركة')->placeholder('—'),
+                    TextEntry::make('status')
+                        ->label('الحالة')
+                        ->badge()
+                        ->formatStateUsing(fn ($state): string => $state instanceof ClientStatus ? $state->label() : (ClientStatus::tryFrom($state)?->label() ?? $state)),
+                    TextEntry::make('assignedUser.name')->label('الموظف المسؤول')->placeholder('غير مسند'),
+                    TextEntry::make('email')->label('البريد الإلكتروني')->placeholder('—'),
+                    TextEntry::make('phone')->label('رقم الهاتف')->placeholder('—'),
+                    TextEntry::make('last_contact_at')->label('آخر تواصل')->dateTime()->placeholder('—'),
+                    TextEntry::make('next_follow_up_at')->label('المتابعة القادمة')->dateTime()->placeholder('—'),
+                    TextEntry::make('created_at')->label('تاريخ الإضافة')->dateTime(),
+                ]),
+            Section::make('ملخص النشاط')
+                ->columns(4)
+                ->schema([
+                    TextEntry::make('interactions_count')
+                        ->label('سجلات التواصل')
+                        ->state(fn (Client $record): int => $record->interactions()->count())
+                        ->badge(),
+                    TextEntry::make('tasks_count')
+                        ->label('المهام')
+                        ->state(function (Client $record): int {
+                            $query = $record->tasks();
+
+                            if (! auth()->user()->isAdmin()) {
+                                $query->where('assigned_to', auth()->id());
+                            }
+
+                            return $query->count();
+                        })
+                        ->badge(),
+                    TextEntry::make('overdue_tasks_count')
+                        ->label('المهام المتأخرة')
+                        ->state(function (Client $record): int {
+                            $query = $record->tasks()->overdue();
+
+                            if (! auth()->user()->isAdmin()) {
+                                $query->where('assigned_to', auth()->id());
+                            }
+
+                            return $query->count();
+                        })
+                        ->badge()
+                        ->color(fn (int $state): string => $state > 0 ? 'danger' : 'success'),
+                    TextEntry::make('invoices_count')
+                        ->label('الفواتير')
+                        ->state(fn (Client $record): int => $record->invoices()->count())
+                        ->badge()
+                        ->visible(fn (): bool => auth()->user()->isAdmin()),
+                    TextEntry::make('invoice_total')
+                        ->label('إجمالي الفواتير')
+                        ->state(fn (Client $record): float => (float) $record->invoices()->sum('total'))
+                        ->money((string) config('app.currency'))
+                        ->visible(fn (): bool => auth()->user()->isAdmin()),
+                    TextEntry::make('invoice_balance')
+                        ->label('الرصيد غير المدفوع')
+                        ->state(fn (Client $record): float => (float) $record->invoices()->sum('total') - (float) $record->invoices()->sum('paid_amount'))
+                        ->money((string) config('app.currency'))
+                        ->visible(fn (): bool => auth()->user()->isAdmin()),
+                ]),
+            Section::make('الملاحظات')
+                ->schema([
+                    TextEntry::make('notes')->label('')->placeholder('لا توجد ملاحظات')->columnSpanFull(),
+                ]),
+        ]);
+    }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -108,6 +186,15 @@ class ClientResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->visibleTo(auth()->user())->with('assignedUser');
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            'interactions' => InteractionsRelationManager::class,
+            'tasks' => TasksRelationManager::class,
+            'invoices' => InvoicesRelationManager::class,
+        ];
     }
 
     public static function getGloballySearchableAttributes(): array
