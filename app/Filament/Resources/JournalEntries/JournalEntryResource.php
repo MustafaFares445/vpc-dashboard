@@ -48,40 +48,59 @@ class JournalEntryResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            Section::make('بيانات القيد')->columns(2)->schema([
-                DatePicker::make('entry_date')->label('تاريخ القيد')->default(today())->required(),
-                TextInput::make('reference')->label('المرجع')->maxLength(255),
-                Textarea::make('description')->label('الوصف')->rows(3)->columnSpanFull(),
-                Repeater::make('lines')->label('أسطر القيد')->minItems(2)->defaultItems(2)->columns(4)->columnSpanFull()->schema([
-                    TextInput::make('account_name')->label('الحساب')->required()->columnSpan(2),
-                    TextInput::make('debit')->label('مدين')->numeric()->minValue(0)->step(0.01)->default(0),
-                    TextInput::make('credit')->label('دائن')->numeric()->minValue(0)->step(0.01)->default(0),
-                    Textarea::make('notes')->label('ملاحظة')->rows(2)->columnSpanFull(),
+            Section::make('بيانات القيد')
+                ->columns(2)
+                ->schema([
+                    DatePicker::make('entry_date')->label('تاريخ القيد')->default(today())->required(),
+                    TextInput::make('reference')->label('المرجع')->maxLength(255),
+                    Textarea::make('description')->label('الوصف')->rows(3)->columnSpanFull(),
+                    Repeater::make('lines')
+                        ->label('أسطر القيد')
+                        ->minItems(2)
+                        ->defaultItems(2)
+                        ->columns(4)
+                        ->columnSpanFull()
+                        ->schema([
+                            TextInput::make('account_name')->label('الحساب')->required()->columnSpan(2),
+                            TextInput::make('debit')->label('مدين')->numeric()->minValue(0)->step(0.01)->default(0),
+                            TextInput::make('credit')->label('دائن')->numeric()->minValue(0)->step(0.01)->default(0),
+                            Textarea::make('notes')->label('ملاحظة')->rows(2)->columnSpanFull(),
+                        ]),
                 ]),
-            ]),
         ]);
     }
 
     public static function table(Table $table): Table
     {
-        return $table->columns([
-            TextColumn::make('entry_date')->label('التاريخ')->date()->sortable(),
-            TextColumn::make('reference')->label('المرجع')->searchable()->placeholder('—'),
-            TextColumn::make('description')->label('الوصف')->limit(60),
-            TextColumn::make('lines_count')->label('عدد الأسطر'),
-            TextColumn::make('lines_sum_debit')->label('إجمالي المدين')->money('USD'),
-            TextColumn::make('lines_sum_credit')->label('إجمالي الدائن')->money('USD'),
-            TextColumn::make('creator.name')->label('أنشأه')->placeholder('النظام'),
-        ])->defaultSort('entry_date', 'desc');
+        $currency = config('app.currency', 'USD');
+
+        return $table
+            ->columns([
+                TextColumn::make('entry_date')->label('التاريخ')->date()->sortable(),
+                TextColumn::make('reference')->label('المرجع')->searchable()->placeholder('—'),
+                TextColumn::make('description')->label('الوصف')->limit(60),
+                TextColumn::make('lines_count')->label('عدد الأسطر'),
+                TextColumn::make('lines_sum_debit')->label('إجمالي المدين')->money($currency),
+                TextColumn::make('lines_sum_credit')->label('إجمالي الدائن')->money($currency),
+                TextColumn::make('creator.name')->label('أنشأه')->placeholder('النظام'),
+            ])
+            ->defaultSort('entry_date', 'desc');
     }
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->with('creator')->withCount('lines')->withSum('lines', 'debit')->withSum('lines', 'credit');
+        return parent::getEloquentQuery()
+            ->with('creator')
+            ->withCount('lines')
+            ->withSum('lines', 'debit')
+            ->withSum('lines', 'credit');
     }
 
     public static function getPages(): array
     {
-        return ['index' => ListJournalEntries::route('/'), 'create' => CreateJournalEntry::route('/create')];
+        return [
+            'index' => ListJournalEntries::route('/'),
+            'create' => CreateJournalEntry::route('/create'),
+        ];
     }
 }
