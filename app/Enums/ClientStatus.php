@@ -1,0 +1,26 @@
+<?php
+
+namespace App\Enums;
+
+enum ClientStatus: string
+{
+    case Lead = 'lead';
+    case Active = 'active';
+    case Inactive = 'inactive';
+
+    public function label(): string
+    {
+        return match ($this) {
+            self::Lead => 'عميل محتمل',
+            self::Active => 'نشط',
+            self::Inactive => 'غير نشط',
+        };
+    }
+
+    public static function options(): array
+    {
+        return collect(self::cases())
+            ->mapWithKeys(fn (self $status): array => [$status->value => $status->label()])
+            ->all();
+    }
+}

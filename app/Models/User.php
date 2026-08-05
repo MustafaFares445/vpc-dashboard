@@ -6,6 +6,7 @@ use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -36,6 +37,16 @@ class User extends Authenticatable implements FilamentUser
             'password' => 'hashed',
             'is_active' => 'boolean',
         ];
+    }
+
+    public function assignedClients(): HasMany
+    {
+        return $this->hasMany(Client::class, 'assigned_to');
+    }
+
+    public function clientInteractions(): HasMany
+    {
+        return $this->hasMany(ClientInteraction::class);
     }
 
     public function canAccessPanel(Panel $panel): bool
