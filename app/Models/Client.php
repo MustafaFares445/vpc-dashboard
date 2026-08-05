@@ -21,16 +21,8 @@ class Client extends Model implements HasMedia
     use SoftDeletes;
 
     protected $fillable = [
-        'name',
-        'company_name',
-        'email',
-        'phone',
-        'status',
-        'assigned_to',
-        'last_contact_at',
-        'next_follow_up_at',
-        'notes',
-        'created_by',
+        'name', 'company_name', 'email', 'phone', 'status', 'assigned_to',
+        'last_contact_at', 'next_follow_up_at', 'notes', 'created_by',
     ];
 
     protected function casts(): array
@@ -57,19 +49,18 @@ class Client extends Model implements HasMedia
         return $this->hasMany(ClientInteraction::class);
     }
 
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(Task::class);
+    }
+
     public function scopeVisibleTo(Builder $query, User $user): Builder
     {
-        if ($user->isAdmin()) {
-            return $query;
-        }
-
-        return $query->where('assigned_to', $user->getKey());
+        return $user->isAdmin() ? $query : $query->where('assigned_to', $user->getKey());
     }
 
     public function scopeFollowUpOverdue(Builder $query): Builder
     {
-        return $query
-            ->whereNotNull('next_follow_up_at')
-            ->where('next_follow_up_at', '<', now());
+        return $query->whereNotNull('next_follow_up_at')->where('next_follow_up_at', '<', now());
     }
 }

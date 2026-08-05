@@ -18,17 +18,9 @@ class User extends Authenticatable implements FilamentUser
     use HasRoles;
     use Notifiable;
 
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'is_active',
-    ];
+    protected $fillable = ['name', 'email', 'password', 'is_active'];
 
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    protected $hidden = ['password', 'remember_token'];
 
     protected function casts(): array
     {
@@ -47,6 +39,11 @@ class User extends Authenticatable implements FilamentUser
     public function clientInteractions(): HasMany
     {
         return $this->hasMany(ClientInteraction::class);
+    }
+
+    public function assignedTasks(): HasMany
+    {
+        return $this->hasMany(Task::class, 'assigned_to');
     }
 
     public function canAccessPanel(Panel $panel): bool
