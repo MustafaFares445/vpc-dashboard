@@ -14,6 +14,7 @@ use App\Models\Invoice;
 use App\Models\Task;
 use App\Models\User;
 use Database\Seeders\RoleSeeder;
+use Illuminate\Support\Facades\Gate;
 use Livewire\Livewire;
 
 beforeEach(function () {
@@ -64,14 +65,23 @@ it('renders the complete client profile for administrators', function () {
     Livewire::test(ViewClient::class, ['record' => $client->getRouteKey()])
         ->assertOk()
         ->assertSee('Acme Medical')
+        ->assertSee('إجمالي الفواتير')
+        ->assertSee('الرصيد غير المدفوع')
         ->assertSeeLivewire(InteractionsRelationManager::class)
+        ->set('activeRelationManager', 'tasks')
         ->assertSeeLivewire(TasksRelationManager::class)
-        ->assertSeeLivewire(InvoicesRelationManager::class);
+        ->assertSee('Prepare quotation')
+        ->set('activeRelationManager', 'invoices')
+        ->assertSeeLivewire(InvoicesRelationManager::class)
+        ->assertSee('INV-CLIENT-001');
 });
 
-it('keeps invoice data hidden from employees on the client profile', function () {
+it('scopes client profile data for employees', function () {
     $employee = User::factory()->create();
     $employee->assignRole('employee');
+
+    $otherEmployee = User::factory()->create();
+    $otherEmployee->assignRole('employee');
 
     $client = Client::query()->create([
         'name' => 'Assigned Client',
@@ -80,13 +90,35 @@ it('keeps invoice data hidden from employees on the client profile', function ()
         'created_by' => $employee->id,
     ]);
 
+    Task::query()->create([
+        'title' => 'Visible employee task',
+        'assigned_to' => $employee->id,
+        'client_id' => $client->id,
+        'priority' => TaskPriority::Medium,
+        'status' => TaskStatus::Pending,
+        'created_by' => $employee->id,
+    ]);
+
+    Task::query()->create([
+        'title' => 'Hidden employee task',
+        'assigned_to' => $otherEmployee->id,
+        'client_id' => $client->id,
+        'priority' => TaskPriority::Medium,
+        'status' => TaskStatus::Pending,
+        'created_by' => $otherEmployee->id,
+    ]);
+
     $this->actingAs($employee);
 
     Livewire::test(ViewClient::class, ['record' => $client->getRouteKey()])
         ->assertOk()
         ->assertSeeLivewire(InteractionsRelationManager::class)
-        ->assertSeeLivewire(TasksRelationManager::class)
-        ->assertDontSeeLivewire(InvoicesRelationManager::class)
         ->assertDontSee('إجمالي الفواتير')
-        ->assertDontSee('الرصيد غير المدفوع');
+        ->assertDontSee('الرصيد غير المدفوع')
+        ->set('activeRelationManager', 'tasks')
+        ->assertSeeLivewire(TasksRelationManager::class)
+        ->assertSee('Visible employee task')
+        ->assertDontSee('Hidden employee task');
+
+    expect(Gate::forUser($employee)->allows('viewAny', Invoice::class))->toBeFalse();
 });
