@@ -80,8 +80,8 @@ class JournalEntryResource extends Resource
                 TextColumn::make('reference')->label('المرجع')->searchable()->placeholder('—'),
                 TextColumn::make('description')->label('الوصف')->limit(60),
                 TextColumn::make('lines_count')->label('عدد الأسطر'),
-                TextColumn::make('lines_sum_debit')->label('إجمالي المدين')->money($currency),
-                TextColumn::make('lines_sum_credit')->label('إجمالي الدائن')->money($currency),
+                TextColumn::make('lines_sum_debit')->label('إجمالي المدين')->money($currency, locale: 'en'),
+                TextColumn::make('lines_sum_credit')->label('إجمالي الدائن')->money($currency, locale: 'en'),
                 TextColumn::make('creator.name')->label('أنشأه')->placeholder('النظام'),
             ])
             ->defaultSort('entry_date', 'desc');
