@@ -32,6 +32,8 @@ class UserResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
 
+    protected static bool $shouldRegisterNavigation = false;
+
     public static function getNavigationGroup(): string|UnitEnum|null
     {
         return 'النظام';
