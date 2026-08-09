@@ -145,12 +145,12 @@ class ClientResource extends Resource
                     TextEntry::make('invoice_total')
                         ->label('إجمالي الفواتير')
                         ->state(fn (Client $record): float => (float) $record->invoices()->sum('total'))
-                        ->money((string) config('app.currency'))
+                        ->money((string) config('app.currency'), locale: 'en')
                         ->visible(fn (): bool => auth()->user()->isAdmin()),
                     TextEntry::make('invoice_balance')
                         ->label('الرصيد غير المدفوع')
                         ->state(fn (Client $record): float => (float) $record->invoices()->sum('total') - (float) $record->invoices()->sum('paid_amount'))
-                        ->money((string) config('app.currency'))
+                        ->money((string) config('app.currency'), locale: 'en')
                         ->visible(fn (): bool => auth()->user()->isAdmin()),
                 ]),
             Section::make('الملاحظات')
