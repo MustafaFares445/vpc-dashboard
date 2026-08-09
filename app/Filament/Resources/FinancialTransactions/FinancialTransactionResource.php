@@ -89,7 +89,7 @@ class FinancialTransactionResource extends Resource
             ->columns([
                 TextColumn::make('date')->label('التاريخ')->date()->sortable(),
                 TextColumn::make('type')->label('النوع')->badge()->formatStateUsing(fn ($state): string => $state instanceof FinancialTransactionType ? $state->label() : FinancialTransactionType::from($state)->label()),
-                TextColumn::make('amount')->label('المبلغ')->money($currency)->sortable()->summarize(Sum::make()->money($currency)),
+                TextColumn::make('amount')->label('المبلغ')->money($currency, locale: 'en')->sortable()->summarize(Sum::make()->money($currency, locale: 'en')),
                 TextColumn::make('payment_status')->label('الدفع')->badge()->formatStateUsing(fn ($state): string => $state instanceof PaymentStatus ? $state->label() : PaymentStatus::from($state)->label()),
                 TextColumn::make('client.name')->label('العميل')->placeholder('—')->searchable(),
                 TextColumn::make('description')->label('الوصف')->limit(50)->toggleable(),
