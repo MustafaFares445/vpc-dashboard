@@ -14,6 +14,8 @@ class Dashboard extends BaseDashboard
 
     protected static ?string $title = 'الرئيسية';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     public function filtersForm(Schema $schema): Schema
     {
         return $schema->components([
