@@ -25,6 +25,8 @@ class JournalEntryResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBookOpen;
 
+    protected static bool $shouldRegisterNavigation = false;
+
     public static function getNavigationGroup(): string|UnitEnum|null
     {
         return 'المحاسبة';
