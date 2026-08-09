@@ -2,6 +2,7 @@
 
 namespace App\Filament;
 
+use App\Filament\Pages\CalendarPage;
 use Filament\Forms\Components\DatePicker;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
@@ -15,6 +16,11 @@ class Dashboard extends BaseDashboard
     protected static ?string $title = 'الرئيسية';
 
     protected static bool $shouldRegisterNavigation = false;
+
+    public function mount(): void
+    {
+        $this->redirect(CalendarPage::getUrl());
+    }
 
     public function filtersForm(Schema $schema): Schema
     {
