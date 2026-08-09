@@ -42,11 +42,11 @@ class InvoicesRelationManager extends RelationManager
                     ->sortable(),
                 TextColumn::make('total')
                     ->label('الإجمالي')
-                    ->money((string) config('app.currency'))
+                    ->money((string) config('app.currency'), locale: 'en')
                     ->sortable(),
                 TextColumn::make('paid_amount')
                     ->label('المدفوع')
-                    ->money((string) config('app.currency')),
+                    ->money((string) config('app.currency'), locale: 'en'),
                 TextColumn::make('status')
                     ->label('حالة الدفع')
                     ->badge()
