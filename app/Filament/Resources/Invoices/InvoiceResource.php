@@ -97,8 +97,8 @@ class InvoiceResource extends Resource
                 TextColumn::make('client.name')->label('العميل')->searchable()->sortable(),
                 TextColumn::make('issue_date')->label('الإصدار')->date()->sortable(),
                 TextColumn::make('due_date')->label('الاستحقاق')->date()->placeholder('—')->sortable(),
-                TextColumn::make('total')->label('الإجمالي')->money($currency)->sortable(),
-                TextColumn::make('paid_amount')->label('المدفوع')->money($currency)->sortable(),
+                TextColumn::make('total')->label('الإجمالي')->money($currency, locale: 'en')->sortable(),
+                TextColumn::make('paid_amount')->label('المدفوع')->money($currency, locale: 'en')->sortable(),
                 TextColumn::make('status')->label('الحالة')->badge()->formatStateUsing(fn ($state): string => $state instanceof InvoiceStatus ? $state->label() : InvoiceStatus::from($state)->label()),
             ])
             ->filters([
