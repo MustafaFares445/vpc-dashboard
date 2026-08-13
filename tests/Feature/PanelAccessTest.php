@@ -11,11 +11,11 @@ it('redirects guests from the admin panel to login', function () {
     $this->get('/admin')->assertRedirect();
 });
 
-it('allows an active administrator to reach the admin panel', function () {
+it('redirects an active administrator from the admin root to the calendar', function () {
     $user = User::factory()->create();
     $user->assignRole('admin');
 
     $this->actingAs($user)
         ->get('/admin')
-        ->assertSuccessful();
+        ->assertRedirect('/admin/calendar');
 });
