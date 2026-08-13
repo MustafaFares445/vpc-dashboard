@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Currency;
 use App\Enums\FinancialTransactionType;
 use App\Enums\PaymentStatus;
 use App\Models\Concerns\LogsModelActivity;
@@ -20,7 +21,7 @@ class FinancialTransaction extends Model implements HasMedia
     use LogsModelActivity;
     use SoftDeletes;
 
-    protected $fillable = ['type', 'date', 'amount', 'payment_status', 'description', 'client_id', 'invoice_id', 'created_by'];
+    protected $fillable = ['type', 'date', 'amount', 'currency', 'payment_status', 'description', 'client_id', 'invoice_id', 'created_by'];
 
     protected function casts(): array
     {
@@ -28,6 +29,7 @@ class FinancialTransaction extends Model implements HasMedia
             'type' => FinancialTransactionType::class,
             'date' => 'date',
             'amount' => 'decimal:2',
+            'currency' => Currency::class,
             'payment_status' => PaymentStatus::class,
         ];
     }
