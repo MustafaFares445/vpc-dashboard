@@ -8,12 +8,14 @@ use App\Filament\Resources\ClientInteractions\Pages\EditClientInteraction;
 use App\Filament\Resources\ClientInteractions\Pages\ListClientInteractions;
 use App\Models\Client;
 use App\Models\ClientInteraction;
+use App\Models\Employee;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
@@ -58,10 +60,33 @@ class ClientInteractionResource extends Resource
                 Select::make('client_id')->label('العميل')
                     ->options(fn (): array => Client::query()->visibleTo(auth()->user())->orderBy('name')->pluck('name', 'id')->all())
                     ->searchable()->preload()->required(),
+                Select::make('employee_id')->label('الموظف')
+                    ->options(fn (): array => Employee::query()
+                        ->where('is_active', true)
+                        ->orderBy('name')
+                        ->get()
+                        ->mapWithKeys(fn (Employee $employee): array => [
+                            $employee->id => $employee->job_title
+                                ? $employee->name.' — '.$employee->job_title
+                                : $employee->name,
+                        ])
+                        ->all())
+                    ->searchable()
+                    ->preload()
+                    ->required(),
                 DateTimePicker::make('contacted_at')->label('تاريخ التواصل')->default(now())->seconds(false)->required(),
                 Select::make('contact_method')->label('وسيلة التواصل')->options(ContactMethod::options()),
                 DateTimePicker::make('next_follow_up_at')->label('المتابعة القادمة')->seconds(false),
                 Textarea::make('note')->label('الملاحظة')->required()->rows(5)->columnSpanFull(),
+                SpatieMediaLibraryFileUpload::make('attachments')
+                    ->label('المرفقات')
+                    ->collection('attachments')
+                    ->multiple()
+                    ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png', 'image/webp'])
+                    ->maxSize(10240)
+                    ->downloadable()
+                    ->openable()
+                    ->columnSpanFull(),
             ]),
         ]);
     }
@@ -70,13 +95,16 @@ class ClientInteractionResource extends Resource
     {
         return $table->columns([
             TextColumn::make('client.name')->label('العميل')->searchable()->sortable(),
-            TextColumn::make('user.name')->label('الموظف')->placeholder('—'),
+            TextColumn::make('employee.name')->label('الموظف')->placeholder('—')->searchable()->sortable(),
             TextColumn::make('contact_method')->label('الوسيلة')->badge()
                 ->formatStateUsing(fn ($state): string => $state instanceof ContactMethod ? $state->label() : (ContactMethod::tryFrom($state)?->label() ?? '—')),
             TextColumn::make('contacted_at')->label('تاريخ التواصل')->dateTime()->sortable(),
             TextColumn::make('next_follow_up_at')->label('المتابعة القادمة')->dateTime()->placeholder('—')->sortable(),
             TextColumn::make('note')->label('الملاحظة')->limit(60)->wrap(),
         ])->filters([
+            SelectFilter::make('employee_id')
+                ->label('الموظف')
+                ->options(fn (): array => Employee::query()->orderBy('name')->pluck('name', 'id')->all()),
             SelectFilter::make('contact_method')->label('الوسيلة')->options(ContactMethod::options()),
         ])->recordActions([EditAction::make()])
             ->toolbarActions([BulkActionGroup::make([DeleteBulkAction::make()])])
@@ -85,7 +113,7 @@ class ClientInteractionResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        $query = parent::getEloquentQuery()->with(['client', 'user']);
+        $query = parent::getEloquentQuery()->with(['client', 'employee']);
         if (auth()->user()->isAdmin()) {
             return $query;
         }

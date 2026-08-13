@@ -7,15 +7,19 @@ use App\Models\Concerns\LogsModelActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class ClientInteraction extends Model
+class ClientInteraction extends Model implements HasMedia
 {
     use HasFactory;
+    use InteractsWithMedia;
     use LogsModelActivity;
 
     protected $fillable = [
         'client_id',
         'user_id',
+        'employee_id',
         'contacted_at',
         'contact_method',
         'note',
@@ -45,6 +49,21 @@ class ClientInteraction extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function employee(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class);
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('attachments')->acceptsMimeTypes([
+            'application/pdf',
+            'image/jpeg',
+            'image/png',
+            'image/webp',
+        ]);
     }
 
     private function syncClientDates(): void
