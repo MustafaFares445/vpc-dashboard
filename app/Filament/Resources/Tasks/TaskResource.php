@@ -112,10 +112,6 @@ class TaskResource extends Resource
                         ->options(TaskStatus::options())
                         ->default(TaskStatus::Pending->value)
                         ->required(),
-                    TextInput::make('reference')
-                        ->label('المرجع')
-                        ->maxLength(255)
-                        ->disabled(fn (): bool => ! auth()->user()->isAdmin()),
                     Textarea::make('notes')
                         ->label('ملاحظات التنفيذ')
                         ->rows(4)
