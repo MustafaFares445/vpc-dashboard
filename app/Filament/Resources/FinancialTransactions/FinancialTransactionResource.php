@@ -4,7 +4,6 @@ namespace App\Filament\Resources\FinancialTransactions;
 
 use App\Enums\Currency;
 use App\Enums\FinancialTransactionType;
-use App\Enums\PaymentStatus;
 use App\Filament\Resources\FinancialTransactions\Pages\CreateFinancialTransaction;
 use App\Filament\Resources\FinancialTransactions\Pages\EditFinancialTransaction;
 use App\Filament\Resources\FinancialTransactions\Pages\ListFinancialTransactions;
@@ -67,7 +66,6 @@ class FinancialTransactionResource extends Resource
                     DatePicker::make('date')->label('التاريخ')->default(today())->required(),
                     TextInput::make('amount')->label('المبلغ')->numeric()->minValue(0.01)->step(0.01)->required(),
                     Select::make('currency')->label('العملة')->options(Currency::options())->default(Currency::USD->value)->required(),
-                    Select::make('payment_status')->label('حالة الدفع')->options(PaymentStatus::options())->default(PaymentStatus::Paid->value)->required(),
                     Select::make('client_id')->label('العميل')->options(fn (): array => Client::query()->orderBy('name')->pluck('name', 'id')->all())->searchable()->preload(),
                     Select::make('invoice_id')
                         ->label('الفاتورة')
@@ -99,7 +97,6 @@ class FinancialTransactionResource extends Resource
                     ->formatStateUsing(fn ($state, FinancialTransaction $record): string => number_format((float) $state, 2).' '.$record->currency->value)
                     ->sortable(),
                 TextColumn::make('currency')->label('العملة')->badge()->formatStateUsing(fn ($state): string => $state instanceof Currency ? $state->label() : Currency::from($state)->label()),
-                TextColumn::make('payment_status')->label('الدفع')->badge()->formatStateUsing(fn ($state): string => $state instanceof PaymentStatus ? $state->label() : PaymentStatus::from($state)->label()),
                 TextColumn::make('client.name')->label('العميل')->placeholder('—')->searchable(),
                 TextColumn::make('invoice.invoice_number')->label('الفاتورة')->placeholder('—')->searchable(),
                 TextColumn::make('description')->label('الوصف')->limit(50)->toggleable(),
@@ -107,7 +104,6 @@ class FinancialTransactionResource extends Resource
             ->filters([
                 SelectFilter::make('type')->label('النوع')->options(self::transactionTypeOptions()),
                 SelectFilter::make('currency')->label('العملة')->options(Currency::options()),
-                SelectFilter::make('payment_status')->label('الدفع')->options(PaymentStatus::options()),
                 Filter::make('date_range')
                     ->schema([
                         DatePicker::make('from')->label('من'),
