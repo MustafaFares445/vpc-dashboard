@@ -1,21 +1,33 @@
 # Roles and Permissions
 
-## Administrator
+## Super Admin
 
-Administrators manage users, clients, assignments, tasks, accounting records, invoices, journal entries, reports, and audit logs.
+`users.is_super_admin = true` is the system-owner bypass. A Super Admin can access every policy/permission and is the only user allowed to manage users, roles, and role permissions.
 
-The system prevents deleting, deactivating, or removing the admin role from the final active administrator.
+The system prevents the active Super Admin from removing their own Super Admin flag, deactivating themselves, or deleting the final active Super Admin.
 
-## Employee
+## Users and employees
 
-Employees can:
+There is no separate Employee model. Every user where `is_super_admin = false` is an employee and can be selected for client assignment, task assignment, and client follow-up responsibility.
 
-- view clients assigned to them;
-- create and update follow-up interactions for those clients;
-- view tasks assigned to them;
-- update task status and execution notes;
-- view their scoped calendar events.
+Employee profile data is stored on `users`: `phone`, `job_title`, `hire_date`, and `notes`.
 
-Employees cannot manage users, accounting data, reports, audit logs, client master data, task assignment, priority, deadline, or administrative task fields.
+## Roles
 
-All rules are enforced with Laravel policies and query scopes, not only hidden menu items.
+Roles are managed with `spatie/laravel-permission`. The built-in roles are:
+
+- `admin`: receives all functional permissions, but cannot manage users/roles unless the user is also a Super Admin.
+- `employee`: receives the default scoped employee permissions.
+
+Super Admins can create additional roles and choose any seeded permissions for them from the Filament **Roles & Permissions** resource.
+
+## Permission groups
+
+- Clients: `clients.view`, `clients.manage`
+- Follow-ups: `interactions.view`, `interactions.create`, `interactions.update`, `interactions.delete`
+- Tasks: `tasks.view`, `tasks.create`, `tasks.update`, `tasks.manage`, `tasks.delete`
+- Accounting: `accounting.view`, `accounting.manage`
+- Audit logs: `audit-logs.view`
+- Reports: `reports.view`
+
+Policies and scoped queries use these permissions. Super Admin is applied through a global `Gate::before` bypass.

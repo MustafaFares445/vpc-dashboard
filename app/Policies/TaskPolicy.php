@@ -9,31 +9,31 @@ class TaskPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->is_active;
+        return $user->can('tasks.view');
     }
 
     public function view(User $user, Task $task): bool
     {
-        return $user->isAdmin() || $task->assigned_to === $user->getKey();
+        return $user->can('tasks.manage') || ($user->can('tasks.view') && $task->assigned_to === $user->getKey());
     }
 
     public function create(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->can('tasks.create');
     }
 
     public function update(User $user, Task $task): bool
     {
-        return $user->isAdmin() || $task->assigned_to === $user->getKey();
+        return $user->can('tasks.manage') || ($user->can('tasks.update') && $task->assigned_to === $user->getKey());
     }
 
     public function delete(User $user, Task $task): bool
     {
-        return $user->isAdmin();
+        return $user->can('tasks.delete');
     }
 
     public function deleteAny(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->can('tasks.delete');
     }
 }

@@ -29,34 +29,14 @@ class TasksRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn (Builder $query): Builder => auth()->user()->isAdmin()
-                ? $query
-                : $query->where('assigned_to', auth()->id()))
+            ->modifyQueryUsing(fn (Builder $query): Builder => auth()->user()->can('tasks.manage') ? $query : $query->where('assigned_to', auth()->id()))
             ->columns([
-                TextColumn::make('title')
-                    ->label('المهمة')
-                    ->searchable()
-                    ->url(fn (Task $record): string => TaskResource::getUrl('edit', ['record' => $record])),
-                TextColumn::make('status')
-                    ->label('الحالة')
-                    ->badge()
-                    ->formatStateUsing(fn ($state): string => $state instanceof TaskStatus ? $state->label() : (TaskStatus::tryFrom($state)?->label() ?? $state)),
-                TextColumn::make('priority')
-                    ->label('الأولوية')
-                    ->badge()
-                    ->formatStateUsing(fn ($state): string => $state instanceof TaskPriority ? $state->label() : (TaskPriority::tryFrom($state)?->label() ?? $state)),
-                TextColumn::make('assignedUser.name')
-                    ->label('المسؤول')
-                    ->placeholder('—'),
-                TextColumn::make('due_at')
-                    ->label('الموعد النهائي')
-                    ->dateTime()
-                    ->placeholder('—')
-                    ->color(fn (Task $record): ?string => $record->is_overdue ? 'danger' : null)
-                    ->sortable(),
-                IconColumn::make('is_overdue')
-                    ->label('متأخرة')
-                    ->boolean(),
+                TextColumn::make('title')->label('المهمة')->searchable()->url(fn (Task $record): string => TaskResource::getUrl('edit', ['record' => $record])),
+                TextColumn::make('status')->label('الحالة')->badge()->formatStateUsing(fn ($state): string => $state instanceof TaskStatus ? $state->label() : (TaskStatus::tryFrom($state)?->label() ?? $state)),
+                TextColumn::make('priority')->label('الأولوية')->badge()->formatStateUsing(fn ($state): string => $state instanceof TaskPriority ? $state->label() : (TaskPriority::tryFrom($state)?->label() ?? $state)),
+                TextColumn::make('assignedUser.name')->label('المسؤول')->placeholder('—'),
+                TextColumn::make('due_at')->label('الموعد النهائي')->dateTime()->placeholder('—')->color(fn (Task $record): ?string => $record->is_overdue ? 'danger' : null)->sortable(),
+                IconColumn::make('is_overdue')->label('متأخرة')->boolean(),
             ])
             ->defaultSort('due_at');
     }

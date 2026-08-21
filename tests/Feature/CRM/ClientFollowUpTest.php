@@ -3,7 +3,6 @@
 use App\Enums\ClientStatus;
 use App\Models\Client;
 use App\Models\ClientInteraction;
-use App\Models\Employee;
 use App\Models\User;
 use Database\Seeders\RoleSeeder;
 
@@ -26,14 +25,16 @@ it('syncs the latest interaction dates to the client', function () {
         ->and($client->fresh()->next_follow_up_at->toDateTimeString())->toBe('2026-08-10 10:00:00');
 });
 
-it('stores the employee responsible for a follow-up', function () {
-    $user = User::factory()->create();
-    $client = Client::query()->create(['name' => 'Acme', 'status' => ClientStatus::Active, 'created_by' => $user->id]);
-    $employee = Employee::query()->create(['name' => 'Sales Employee', 'is_active' => true]);
+it('stores a non-super-admin user as the employee responsible for a follow-up', function () {
+    $creator = User::factory()->create();
+    $creator->assignRole('employee');
+    $client = Client::query()->create(['name' => 'Acme', 'status' => ClientStatus::Active, 'created_by' => $creator->id]);
+    $employee = User::factory()->create(['is_super_admin' => false, 'job_title' => 'Sales']);
+    $employee->assignRole('employee');
 
     $interaction = ClientInteraction::query()->create([
         'client_id' => $client->id,
-        'user_id' => $user->id,
+        'user_id' => $creator->id,
         'employee_id' => $employee->id,
         'contacted_at' => '2026-08-01 10:00:00',
         'note' => 'Follow-up call',
