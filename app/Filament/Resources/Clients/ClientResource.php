@@ -38,6 +38,7 @@ use UnitEnum;
 class ClientResource extends Resource
 {
     protected static ?string $model = Client::class;
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice2;
 
     public static function getNavigationGroup(): string|UnitEnum|null { return 'العملاء'; }

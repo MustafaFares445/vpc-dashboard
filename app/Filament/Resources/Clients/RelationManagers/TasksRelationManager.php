@@ -16,7 +16,9 @@ use Illuminate\Database\Eloquent\Builder;
 class TasksRelationManager extends RelationManager
 {
     protected static string $relationship = 'tasks';
+
     protected static ?string $title = 'المهام المرتبطة';
+
     protected static bool $isLazy = false;
 
     public function form(Schema $schema): Schema
