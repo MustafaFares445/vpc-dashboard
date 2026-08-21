@@ -39,7 +39,7 @@ class TaskResource extends Resource
 
     public static function getNavigationGroup(): string|UnitEnum|null
     {
-        return 'المهام';
+        return 'CRM';
     }
 
     public static function getNavigationLabel(): string
