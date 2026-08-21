@@ -41,10 +41,25 @@ class ClientResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice2;
 
-    public static function getNavigationGroup(): string|UnitEnum|null { return 'العملاء'; }
-    public static function getNavigationLabel(): string { return 'العملاء'; }
-    public static function getModelLabel(): string { return 'عميل'; }
-    public static function getPluralModelLabel(): string { return 'العملاء'; }
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return 'العملاء';
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return 'العملاء';
+    }
+
+    public static function getModelLabel(): string
+    {
+        return 'عميل';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'العملاء';
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -84,12 +99,20 @@ class ClientResource extends Resource
                 TextEntry::make('interactions_count')->label('سجلات التواصل')->state(fn (Client $record): int => $record->interactions()->count())->badge(),
                 TextEntry::make('tasks_count')->label('المهام')->state(function (Client $record): int {
                     $query = $record->tasks();
-                    if (! auth()->user()->can('tasks.manage')) { $query->where('assigned_to', auth()->id()); }
+
+                    if (! auth()->user()->can('tasks.manage')) {
+                        $query->where('assigned_to', auth()->id());
+                    }
+
                     return $query->count();
                 })->badge(),
                 TextEntry::make('overdue_tasks_count')->label('المهام المتأخرة')->state(function (Client $record): int {
                     $query = $record->tasks()->overdue();
-                    if (! auth()->user()->can('tasks.manage')) { $query->where('assigned_to', auth()->id()); }
+
+                    if (! auth()->user()->can('tasks.manage')) {
+                        $query->where('assigned_to', auth()->id());
+                    }
+
                     return $query->count();
                 })->badge()->color(fn (int $state): string => $state > 0 ? 'danger' : 'success'),
                 TextEntry::make('invoices_count')->label('الفواتير')->state(fn (Client $record): int => $record->invoices()->count())->badge()->visible(fn (): bool => auth()->user()->can('accounting.view')),
@@ -130,8 +153,15 @@ class ClientResource extends Resource
         return ['interactions' => InteractionsRelationManager::class, 'tasks' => TasksRelationManager::class, 'invoices' => InvoicesRelationManager::class];
     }
 
-    public static function getGloballySearchableAttributes(): array { return ['name', 'company_name', 'email', 'phone']; }
-    public static function getGlobalSearchResultTitle(Model $record): string { return $record->name; }
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'company_name', 'email', 'phone'];
+    }
+
+    public static function getGlobalSearchResultTitle(Model $record): string
+    {
+        return $record->name;
+    }
 
     public static function getPages(): array
     {
