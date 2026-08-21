@@ -35,7 +35,7 @@ class ClientInteractionResource extends Resource
 
     public static function getNavigationGroup(): string|UnitEnum|null
     {
-        return 'العملاء';
+        return 'CRM';
     }
 
     public static function getNavigationLabel(): string
