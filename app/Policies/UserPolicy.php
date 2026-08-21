@@ -8,31 +8,31 @@ class UserPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->isSuperAdmin();
     }
 
     public function view(User $user, User $model): bool
     {
-        return $user->isAdmin();
+        return $user->isSuperAdmin();
     }
 
     public function create(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->isSuperAdmin();
     }
 
     public function update(User $user, User $model): bool
     {
-        return $user->isAdmin();
+        return $user->isSuperAdmin();
     }
 
     public function delete(User $user, User $model): bool
     {
-        if (! $user->isAdmin() || $user->is($model)) {
+        if (! $user->isSuperAdmin() || $user->is($model)) {
             return false;
         }
 
-        if ($model->isAdmin() && User::role('admin')->where('is_active', true)->count() <= 1) {
+        if ($model->isSuperAdmin() && User::query()->where('is_super_admin', true)->where('is_active', true)->count() <= 1) {
             return false;
         }
 

@@ -9,17 +9,17 @@ class JournalEntryPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->can('accounting.view');
     }
 
     public function view(User $user, JournalEntry $entry): bool
     {
-        return $user->isAdmin();
+        return $user->can('accounting.view');
     }
 
     public function create(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->can('accounting.manage');
     }
 
     public function update(User $user, JournalEntry $entry): bool

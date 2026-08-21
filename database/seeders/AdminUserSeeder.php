@@ -23,6 +23,7 @@ class AdminUserSeeder extends Seeder
                 'name' => $name,
                 'password' => $password,
                 'is_active' => true,
+                'is_super_admin' => true,
             ],
         );
 

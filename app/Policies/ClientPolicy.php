@@ -9,31 +9,31 @@ class ClientPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->is_active;
+        return $user->can('clients.view');
     }
 
     public function view(User $user, Client $client): bool
     {
-        return $user->isAdmin() || $client->assigned_to === $user->getKey();
+        return $user->can('clients.manage') || ($user->can('clients.view') && $client->assigned_to === $user->getKey());
     }
 
     public function create(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->can('clients.manage');
     }
 
     public function update(User $user, Client $client): bool
     {
-        return $user->isAdmin();
+        return $user->can('clients.manage');
     }
 
     public function delete(User $user, Client $client): bool
     {
-        return $user->isAdmin();
+        return $user->can('clients.manage');
     }
 
     public function deleteAny(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->can('clients.manage');
     }
 }

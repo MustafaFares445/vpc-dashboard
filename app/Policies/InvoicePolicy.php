@@ -9,31 +9,31 @@ class InvoicePolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->can('accounting.view');
     }
 
     public function view(User $user, Invoice $invoice): bool
     {
-        return $user->isAdmin();
+        return $user->can('accounting.view');
     }
 
     public function create(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->can('accounting.manage');
     }
 
     public function update(User $user, Invoice $invoice): bool
     {
-        return $user->isAdmin();
+        return $user->can('accounting.manage');
     }
 
     public function delete(User $user, Invoice $invoice): bool
     {
-        return $user->isAdmin();
+        return $user->can('accounting.manage');
     }
 
     public function deleteAny(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->can('accounting.manage');
     }
 }

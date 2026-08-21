@@ -59,7 +59,7 @@ class Client extends Model implements HasMedia
 
     public function scopeVisibleTo(Builder $query, User $user): Builder
     {
-        return $user->isAdmin() ? $query : $query->where('assigned_to', $user->getKey());
+        return $user->can('clients.manage') ? $query : $query->where('assigned_to', $user->getKey());
     }
 
     public function scopeFollowUpOverdue(Builder $query): Builder

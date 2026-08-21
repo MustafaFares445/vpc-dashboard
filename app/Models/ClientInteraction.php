@@ -53,7 +53,7 @@ class ClientInteraction extends Model implements HasMedia
 
     public function employee(): BelongsTo
     {
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(User::class, 'employee_id');
     }
 
     public function registerMediaCollections(): void

@@ -15,13 +15,15 @@ it('allows active users and blocks inactive users from the panel', function () {
         ->and($inactive->canAccessPanel(filament()->getPanel('admin')))->toBeFalse();
 });
 
-it('allows only admins to manage users', function () {
-    $admin = User::factory()->create();
+it('allows only super admins to manage users', function () {
+    $superAdmin = User::factory()->create(['is_super_admin' => true]);
+    $superAdmin->assignRole('admin');
+    $admin = User::factory()->create(['is_super_admin' => false]);
     $admin->assignRole('admin');
-
-    $employee = User::factory()->create();
+    $employee = User::factory()->create(['is_super_admin' => false]);
     $employee->assignRole('employee');
 
-    expect($admin->can('viewAny', User::class))->toBeTrue()
+    expect($superAdmin->can('viewAny', User::class))->toBeTrue()
+        ->and($admin->can('viewAny', User::class))->toBeFalse()
         ->and($employee->can('viewAny', User::class))->toBeFalse();
 });

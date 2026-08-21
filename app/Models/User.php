@@ -5,6 +5,7 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -19,13 +20,34 @@ class User extends Authenticatable implements FilamentUser
     use HasRoles;
     use Notifiable;
 
-    protected $fillable = ['name', 'email', 'password', 'is_active'];
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'is_active',
+        'is_super_admin',
+        'phone',
+        'job_title',
+        'hire_date',
+        'notes',
+    ];
 
     protected $hidden = ['password', 'remember_token'];
 
     protected function casts(): array
     {
-        return ['email_verified_at' => 'datetime', 'password' => 'hashed', 'is_active' => 'boolean'];
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+            'is_active' => 'boolean',
+            'is_super_admin' => 'boolean',
+            'hire_date' => 'date',
+        ];
+    }
+
+    public function scopeEmployees(Builder $query): Builder
+    {
+        return $query->where('is_super_admin', false);
     }
 
     public function assignedClients(): HasMany
@@ -36,6 +58,11 @@ class User extends Authenticatable implements FilamentUser
     public function clientInteractions(): HasMany
     {
         return $this->hasMany(ClientInteraction::class);
+    }
+
+    public function employeeInteractions(): HasMany
+    {
+        return $this->hasMany(ClientInteraction::class, 'employee_id');
     }
 
     public function assignedTasks(): HasMany
@@ -63,8 +90,18 @@ class User extends Authenticatable implements FilamentUser
         return $panel->getId() === 'admin' && $this->is_active;
     }
 
+    public function isSuperAdmin(): bool
+    {
+        return $this->is_super_admin;
+    }
+
+    public function isEmployee(): bool
+    {
+        return ! $this->is_super_admin;
+    }
+
     public function isAdmin(): bool
     {
-        return $this->hasRole('admin');
+        return $this->is_super_admin || $this->hasRole('admin');
     }
 }
