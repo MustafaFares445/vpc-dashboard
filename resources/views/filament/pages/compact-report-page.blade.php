@@ -72,8 +72,8 @@
                 </span>
 
                 <div>
-                    <h2>الفترة الزمنية</h2>
-                    <p>اختر الفترة التي تريد عرض ملخص التقرير خلالها.</p>
+                    <h2>الفترة الزمنية وحالة الدفع</h2>
+                    <p>اختر الفترة وحالة الدفع التي تريد عرض ملخص التقرير خلالها.</p>
                 </div>
             </div>
 
@@ -95,6 +95,15 @@
                         class="compact-report__date-input"
                     />
                 </label>
+
+                <label class="compact-report__field">
+                    <span>حالة الدفع</span>
+                    <select wire:model.live="paymentStatus" class="compact-report__date-input">
+                        @foreach ($this->paymentStatusOptions() as $value => $label)
+                            <option value="{{ $value }}">{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </label>
             </div>
         </section>
 
@@ -102,7 +111,7 @@
             <div class="compact-report__section-heading">
                 <div>
                     <h2>الملخص المالي</h2>
-                    <p>نظرة سريعة على الأداء المالي خلال الفترة المحددة.</p>
+                    <p>نظرة سريعة على الأداء المالي خلال الفترة وحالة الدفع المحددتين.</p>
                 </div>
             </div>
 
@@ -172,7 +181,7 @@
 
         .compact-report__filter {
             display: grid;
-            grid-template-columns: minmax(0, 1fr) minmax(360px, 0.9fr);
+            grid-template-columns: minmax(0, 1fr) minmax(520px, 1.2fr);
             align-items: center;
             gap: 1.5rem;
             padding: 1.25rem;
@@ -228,7 +237,7 @@
 
         .compact-report__date-grid {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 0.875rem;
         }
 

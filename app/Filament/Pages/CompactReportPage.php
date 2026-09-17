@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Enums\PaymentStatus;
 use App\Services\CompactReportService;
 use BackedEnum;
 use Filament\Pages\Page;
@@ -24,6 +25,8 @@ class CompactReportPage extends Page
 
     public string $to;
 
+    public string $paymentStatus = 'all';
+
     public function mount(): void
     {
         $this->from = now()->startOfMonth()->toDateString();
@@ -37,7 +40,12 @@ class CompactReportPage extends Page
 
     public function summary(): array
     {
-        return app(CompactReportService::class)->summarize($this->from, $this->to);
+        return app(CompactReportService::class)->summarize($this->from, $this->to, $this->paymentStatus);
+    }
+
+    public function paymentStatusOptions(): array
+    {
+        return ['all' => 'الكل', ...PaymentStatus::options()];
     }
 
     public function getHeading(): string

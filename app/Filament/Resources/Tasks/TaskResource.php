@@ -73,8 +73,8 @@ class TaskResource extends Resource
                         ->disabled(fn (): bool => ! auth()->user()->can('tasks.manage'))
                         ->dehydrated(),
                     Select::make('client_id')
-                        ->label('العميل')
-                        ->options(fn (): array => Client::query()->visibleTo(auth()->user())->orderBy('name')->pluck('name', 'id')->all())
+                        ->label('الشركة')
+                        ->options(fn (): array => self::clientOptions())
                         ->searchable()->preload()->disabled(fn (): bool => ! auth()->user()->can('tasks.manage')),
                     DateTimePicker::make('due_at')->label('الموعد النهائي')->seconds(false)->disabled(fn (): bool => ! auth()->user()->can('tasks.manage')),
                     Select::make('priority')->label('الأولوية')->options(TaskPriority::options())->default(TaskPriority::Medium->value)->required()->disabled(fn (): bool => ! auth()->user()->can('tasks.manage')),
@@ -90,7 +90,7 @@ class TaskResource extends Resource
             ->columns([
                 TextColumn::make('title')->label('المهمة')->searchable()->sortable(),
                 TextColumn::make('assignedUser.name')->label('الموظف')->sortable(),
-                TextColumn::make('client.name')->label('العميل')->placeholder('—')->searchable(),
+                TextColumn::make('client.company_name')->label('الشركة')->placeholder('—')->searchable(),
                 TextColumn::make('priority')->label('الأولوية')->badge()->formatStateUsing(fn ($state): string => $state instanceof TaskPriority ? $state->label() : (TaskPriority::tryFrom($state)?->label() ?? $state)),
                 TextColumn::make('status')->label('الحالة')->badge()->formatStateUsing(fn ($state): string => $state instanceof TaskStatus ? $state->label() : (TaskStatus::tryFrom($state)?->label() ?? $state)),
                 TextColumn::make('due_at')->label('الموعد النهائي')->dateTime()->placeholder('—')->sortable()->color(fn (Task $record): ?string => $record->is_overdue ? 'danger' : null),
@@ -127,5 +127,16 @@ class TaskResource extends Resource
             'create' => CreateTask::route('/create'),
             'edit' => EditTask::route('/{record}/edit'),
         ];
+    }
+
+    private static function clientOptions(): array
+    {
+        return Client::query()
+            ->visibleTo(auth()->user())
+            ->orderBy('company_name')
+            ->orderBy('name')
+            ->get(['id', 'name', 'company_name'])
+            ->mapWithKeys(fn (Client $client): array => [$client->id => $client->company_name ?: $client->name])
+            ->all();
     }
 }

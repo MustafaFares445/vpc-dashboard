@@ -9,10 +9,10 @@ use App\Models\Task;
 
 class CompactReportService
 {
-    public function summarize(mixed $from, mixed $to): array
+    public function summarize(mixed $from, mixed $to, mixed $paymentStatus = null): array
     {
         return [
-            ...app(FinancialSummaryService::class)->summarize($from, $to),
+            ...app(FinancialSummaryService::class)->summarize($from, $to, $paymentStatus),
             'new_clients' => Client::query()->whereDate('created_at', '>=', $from)->whereDate('created_at', '<=', $to)->count(),
             'completed_tasks' => Task::query()->where('status', TaskStatus::Completed->value)->whereDate('completed_at', '>=', $from)->whereDate('completed_at', '<=', $to)->count(),
             'overdue_tasks' => Task::query()->overdue()->whereDate('due_at', '>=', $from)->whereDate('due_at', '<=', $to)->count(),

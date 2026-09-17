@@ -3,14 +3,19 @@
 namespace App\Services;
 
 use App\Enums\FinancialTransactionType;
+use App\Enums\PaymentStatus;
 use App\Models\FinancialTransaction;
 use Illuminate\Database\Eloquent\Builder;
 
 class FinancialSummaryService
 {
-    public function summarize(mixed $from = null, mixed $to = null): array
+    public function summarize(mixed $from = null, mixed $to = null, mixed $paymentStatus = null): array
     {
-        $query = FinancialTransaction::query()->betweenDates($from, $to);
+        $status = $paymentStatus instanceof PaymentStatus ? $paymentStatus->value : $paymentStatus;
+        $query = FinancialTransaction::query()
+            ->betweenDates($from, $to)
+            ->when($status && $status !== 'all', fn (Builder $query): Builder => $query->where('payment_status', $status));
+
         $income = $this->sumForType(clone $query, FinancialTransactionType::Income);
         $expenses = $this->sumForType(clone $query, FinancialTransactionType::Expense);
         $costs = $this->sumForType(clone $query, FinancialTransactionType::Cost);

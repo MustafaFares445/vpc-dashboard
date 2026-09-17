@@ -21,7 +21,7 @@ class FinancialTransaction extends Model implements HasMedia
     use LogsModelActivity;
     use SoftDeletes;
 
-    protected $fillable = ['type', 'date', 'amount', 'currency', 'payment_status', 'description', 'client_id', 'invoice_id', 'created_by'];
+    protected $fillable = ['type', 'date', 'amount', 'currency', 'payment_status', 'description', 'client_id', 'employee_id', 'invoice_id', 'created_by'];
 
     protected function casts(): array
     {
@@ -37,6 +37,11 @@ class FinancialTransaction extends Model implements HasMedia
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function employee(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'employee_id');
     }
 
     public function invoice(): BelongsTo
