@@ -29,7 +29,13 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->profile()
             ->brandName('VPC Dashboard')
-            ->colors(['primary' => Color::Amber])
+            ->brandLogo(asset('images/brand/vpc-logo-light.svg'))
+            ->darkModeBrandLogo(asset('images/brand/vpc-logo-dark.svg'))
+            ->brandLogoHeight('2.75rem')
+            ->colors([
+                'primary' => Color::hex('#FBC339'),
+                'info' => Color::hex('#1D3761'),
+            ])
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
