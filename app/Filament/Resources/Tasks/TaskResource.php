@@ -7,6 +7,7 @@ use App\Enums\TaskStatus;
 use App\Filament\Resources\Tasks\Pages\CreateTask;
 use App\Filament\Resources\Tasks\Pages\EditTask;
 use App\Filament\Resources\Tasks\Pages\ListTasks;
+use App\Filament\Resources\Tasks\Pages\ViewTask;
 use App\Models\Client;
 use App\Models\Task;
 use App\Models\User;
@@ -15,10 +16,12 @@ use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -84,11 +87,60 @@ class TaskResource extends Resource
         ]);
     }
 
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema->components([
+            Section::make('تفاصيل المهمة')
+                ->columns(2)
+                ->schema([
+                    TextEntry::make('title')
+                        ->label('عنوان المهمة')
+                        ->columnSpanFull(),
+                    TextEntry::make('description')
+                        ->label('الوصف والشرح')
+                        ->placeholder('لا يوجد وصف للمهمة')
+                        ->columnSpanFull(),
+                    TextEntry::make('assignedUser.name')
+                        ->label('الموظف المسؤول')
+                        ->placeholder('غير مسند'),
+                    TextEntry::make('client_display')
+                        ->label('الشركة')
+                        ->state(fn (Task $record): string => $record->client?->company_name ?: ($record->client?->name ?? '—')),
+                    TextEntry::make('priority')
+                        ->label('الأولوية')
+                        ->badge()
+                        ->formatStateUsing(fn ($state): string => $state instanceof TaskPriority ? $state->label() : (TaskPriority::tryFrom($state)?->label() ?? $state)),
+                    TextEntry::make('status')
+                        ->label('الحالة')
+                        ->badge()
+                        ->formatStateUsing(fn ($state): string => $state instanceof TaskStatus ? $state->label() : (TaskStatus::tryFrom($state)?->label() ?? $state)),
+                    TextEntry::make('due_at')
+                        ->label('الموعد النهائي')
+                        ->dateTime()
+                        ->placeholder('—'),
+                    TextEntry::make('reference')
+                        ->label('المرجع')
+                        ->placeholder('—'),
+                ]),
+            Section::make('ملاحظات التنفيذ')
+                ->schema([
+                    TextEntry::make('notes')
+                        ->label('')
+                        ->placeholder('لا توجد ملاحظات تنفيذ')
+                        ->columnSpanFull(),
+                ]),
+        ]);
+    }
+
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('title')->label('المهمة')->searchable()->sortable(),
+                TextColumn::make('title')
+                    ->label('المهمة')
+                    ->searchable()
+                    ->sortable()
+                    ->url(fn (Task $record): string => static::getUrl('view', ['record' => $record])),
                 TextColumn::make('assignedUser.name')->label('الموظف')->sortable(),
                 TextColumn::make('client.company_name')->label('الشركة')->placeholder('—')->searchable(),
                 TextColumn::make('priority')->label('الأولوية')->badge()->formatStateUsing(fn ($state): string => $state instanceof TaskPriority ? $state->label() : (TaskPriority::tryFrom($state)?->label() ?? $state)),
@@ -106,6 +158,7 @@ class TaskResource extends Resource
                 Filter::make('overdue')->label('المهام المتأخرة')->query(fn (Builder $query): Builder => $query->overdue()),
             ])
             ->recordActions([
+                ViewAction::make()->label('عرض التفاصيل'),
                 Action::make('complete')->label('إكمال')->icon(Heroicon::OutlinedCheckCircle)->color('success')->requiresConfirmation()
                     ->visible(fn (Task $record): bool => $record->status !== TaskStatus::Completed)
                     ->action(fn (Task $record) => $record->update(['status' => TaskStatus::Completed])),
@@ -125,6 +178,7 @@ class TaskResource extends Resource
         return [
             'index' => ListTasks::route('/'),
             'create' => CreateTask::route('/create'),
+            'view' => ViewTask::route('/{record}'),
             'edit' => EditTask::route('/{record}/edit'),
         ];
     }
